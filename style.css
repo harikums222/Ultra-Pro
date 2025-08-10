@@ -743,7 +743,7 @@ select.form-control {
 /* Override root variables for company branding */
 :root {
  /* --color-brand-primary: #FF6B00; */
-  --color-brand-primary: #CD5C5C; 
+  --color-brand-primary: #A2BFFE; 
   --color-brand-primary-hover: #E65A00;
   --color-brand-primary-active: #CC5200;
   --color-brand-secondary: #000000;
