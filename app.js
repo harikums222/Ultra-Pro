@@ -446,7 +446,64 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+//---------------------------------------------------------------------------------------------------
+// TEMP: Direct Telegram send from browser (testing only)
+async function sendTelegramDirect(formData) {
+  const BOT_TOKEN = "7162618456:AAF7bxO-eRwax1oyB0TpAZkoAjWBApjxM0s"; // replace, then remove after testing
+  const CHAT_ID = "913619585";      // your chat_id (e.g., 123456789 or -100...)
 
+  const lines = [
+    "New Quote Request",
+    `Name: ${formData.name}`,
+    `Phone: ${formData.phone}`,
+    `Email: ${formData.email}`,
+    `Service: ${formData.service}`,
+    `From: ${formData.from}`,
+    `To: ${formData.to}`,
+    `Requirements: ${formData.message || "-"}`,
+    "Source: Website"
+  ];
+  const text = lines.join("\n");
+
+  const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+  try {
+    const resp = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chat_id: CHAT_ID, text })
+    });
+    return resp.ok;
+  } catch (err) {
+    console.error("Telegram send error:", err);
+    return false;
+  }
+}
+
+// Wire up the form submit
+document.getElementById("quoteForm")?.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const formData = {
+    name: document.getElementById("name").value.trim(),
+    phone: document.getElementById("phone").value.trim(),
+    email: document.getElementById("email").value.trim(),
+    service: document.getElementById("service").value,
+    from: document.getElementById("from").value.trim(),
+    to: document.getElementById("to").value.trim(),
+    message: document.getElementById("message").value.trim()
+  };
+
+  // Simple validation
+  if (!formData.name || !formData.phone || !formData.email || !formData.service || !formData.from || !formData.to) {
+    alert("Please fill all required fields.");
+    return;
+  }
+
+  const ok = await sendTelegramDirect(formData);
+  alert(ok ? "Quote sent to Telegram (test mode)." : "Failed to send to Telegram. Please try again.");
+  if (ok) e.target.reset();
+});
+//-----------------------------------------------------------------------------------------------------------------
 // Add CSS animation keyframes and styles dynamically
 const style = document.createElement('style');
 style.textContent = `
