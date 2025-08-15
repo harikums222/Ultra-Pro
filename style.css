@@ -115,6 +115,7 @@
   --space-24: 24px;
   --space-32: 32px;
   --space-44: 44px;
+  --space-58: 58px;
 
   /* Border Radius */
   --radius-sm: 6px;
@@ -791,7 +792,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-12) 0;
+  padding: var(--space-6) 0;
 }
 
 .logo {
@@ -920,7 +921,7 @@ body {
 /* Hero Section */
 .hero {
   background: linear-gradient(135deg, var(--color-bg-1) 0%, var(--color-bg-2) 100%);
-  padding: 120px 0 var(--space-32);
+  padding: 160px 0 var(--space-58);
   text-align: center;
 }
 
@@ -933,14 +934,14 @@ body {
   font-size: clamp(var(--font-size-3xl), 4vw, 48px);
   font-weight: var(--font-weight-bold);
   color: var(--color-text);
-  margin-bottom: var(--space-16);
+  margin-bottom: var(--space-32);
   letter-spacing: var(--letter-spacing-tight);
 }
 
 .hero-subtitle {
   font-size: var(--font-size-xl);
   color: var(--color-text-secondary);
-  margin-bottom: var(--space-32);
+  margin-bottom: var(--space-44);
   line-height: var(--line-height-normal);
 }
 
@@ -948,7 +949,7 @@ body {
   display: flex;
   justify-content: center;
   gap: var(--space-32);
-  margin-bottom: var(--space-32);
+  margin-bottom: var(--space-44);
   flex-wrap: wrap;
 }
 

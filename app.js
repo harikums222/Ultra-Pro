@@ -59,6 +59,11 @@ function smoothScrollTo(element) {
 }
 
 // Scroll to contact section (used by quote buttons)
+/**
+ * Scrolls smoothly to the contact section of the page and focuses on the first input field.
+ * If the contact section exists, it uses `smoothScrollTo` to scroll to it,
+ * then after a short delay, focuses the input field with the ID 'name' if present.
+ */
 function scrollToContact() {
     const contactSection = document.getElementById('contact');
     if (contactSection) {
