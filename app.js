@@ -4,9 +4,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize all functionality when DOM is loaded
     initializeNavigation();
     initializeContactForm();
-    initializeScrollEffects();
+    /*initializeScrollEffects(); */
+    initializeServiceCardTilt();
     initializeMobileMenu();
     initializeFooterLinks();
+    initializeAboutStatsCounter();
 });
 
 // Navigation functionality
@@ -432,6 +434,65 @@ function initializeScrollEffects() {
     });
 }
 
+function initializeServiceCardTilt() {
+  const cards = document.querySelectorAll('.service-card');
+  if (!cards.length) return;
+
+  const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
+
+  cards.forEach(card => {
+    let rafId = null;
+
+    const getRect = () => card.getBoundingClientRect();
+    const maxTilt = 10; // degrees
+    const maxZ = 30; // px
+
+    const onMove = (e) => {
+      const rect = getRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const dx = e.clientX - cx;
+      const dy = e.clientY - cy;
+
+      const nx = clamp(dx / (rect.width / 2), -1, 1);
+      const ny = clamp(dy / (rect.height / 2), -1, 1);
+
+      const rotateY = nx * maxTilt;
+      const rotateX = -ny * maxTilt;
+
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        card.classList.add('is-tilting');
+        card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-6px) scale(1.03)`;
+        const inner = card.querySelector('.service-card-inner') || card;
+        inner.style.transform = `translateZ(${(Math.abs(nx) + Math.abs(ny)) * (maxZ / 1.6)}px)`;
+      });
+    };
+
+    const onLeave = () => {
+      if (rafId) cancelAnimationFrame(rafId);
+      card.classList.remove('is-tilting');
+      card.style.transform = '';
+      const inner = card.querySelector('.service-card-inner') || card;
+      inner.style.transform = '';
+    };
+
+    card.addEventListener('mouseenter', () => card.classList.add('is-tilting'));
+    card.addEventListener('mousemove', onMove);
+    card.addEventListener('mouseleave', onLeave);
+
+    // Touch fallback: gentle pop
+    card.addEventListener('touchstart', () => {
+      card.classList.add('is-tilting');
+      card.style.transform = 'translateY(-8px) scale(1.03)';
+      const inner = card.querySelector('.service-card-inner') || card;
+      inner.style.transform = 'translateZ(20px)';
+    }, { passive: true });
+    card.addEventListener('touchend', onLeave, { passive: true });
+    card.addEventListener('touchcancel', onLeave, { passive: true });
+  });
+}
+
 // Phone number click tracking
 document.addEventListener('DOMContentLoaded', function() {
     const phoneLinks = document.querySelectorAll('a[href^="tel:"]');
@@ -451,6 +512,55 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+function initializeAboutStatsCounter() {
+  const el = document.getElementById('stat-projects');
+  if (!el) return;
+
+  const targetText = el.textContent.trim();
+  const match = targetText.match(/(\d[\d,]*)/);
+  if (!match) return;
+
+  const target = parseInt(match[1].replace(/,/g, ''), 10);
+  const suffix = targetText.replace(match[1], '');
+
+  let started = false;
+  const duration = 1400;
+
+  const formatNumber = (n) => n.toLocaleString('en-IN');
+
+  const animate = () => {
+    const start = performance.now();
+
+    const tick = (now) => {
+      const p = Math.min(1, (now - start) / duration);
+      const ease = 1 - Math.pow(1 - p, 3); // cubic out
+      const current = Math.floor(target * ease);
+      el.textContent = `${formatNumber(current)}${suffix}`;
+      if (p < 1) {
+        requestAnimationFrame(tick);
+      } else {
+        el.textContent = `${formatNumber(target)}${suffix}`;
+      }
+    };
+
+    requestAnimationFrame(tick);
+  };
+
+  const onIntersect = (entries, obs) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting && !started) {
+        started = true;
+        animate();
+        obs.disconnect();
+      }
+    });
+  };
+
+  const observer = new IntersectionObserver(onIntersect, { threshold: 0.3 });
+  observer.observe(el);
+}
+
 //---------------------------------------------------------------------------------------------------
 // TEMP: Direct Telegram send from browser (testing only)
 async function sendTelegramDirect(formData) {

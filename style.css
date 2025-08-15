@@ -997,12 +997,21 @@ body {
   border-radius: var(--radius-lg);
   text-align: center;
   border: 1px solid var(--color-card-border);
-  transition: all var(--duration-normal) var(--ease-standard);
+  transition: 
+    box-shadow var(--duration-normal) var(--ease-standard),
+    border-color var(--duration-normal) var(--ease-standard),
+    transform var(--duration-normal) var(--ease-standard);
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+  will-change: transform, box-shadow;
 }
 
-.service-card:hover {
-  transform: translateY(-4px);
+.service-card:hover,
+.service-card:focus-within {
+  transform: translateY(-8px) scale(1.03);
   box-shadow: var(--shadow-lg);
+  z-index: 10;
 }
 
 .service-icon {
@@ -1033,6 +1042,70 @@ body {
   line-height: var(--line-height-normal);
 }
 
+/* --- Services: 3D pop-out & tilt upgrade --- */
+.services {
+  perspective: 1000px;
+}
+
+.service-card {
+  transform-style: preserve-3d;
+  transition:
+    transform var(--duration-normal) var(--ease-standard),
+    box-shadow var(--duration-normal) var(--ease-standard),
+    border-color var(--duration-normal) var(--ease-standard);
+  will-change: transform, box-shadow;
+}
+
+.service-card-inner {
+  transform: translateZ(0);
+  transition: transform var(--duration-normal) var(--ease-standard);
+}
+
+.service-card:hover,
+.service-card:focus-within {
+  transform: translateY(-8px) scale(1.03);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.12), 0 8px 16px rgba(0,0,0,0.06);
+  border-color: rgba(var(--color-brown-600-rgb), 0.25);
+  z-index: 10;
+}
+
+.service-card.is-tilting {
+  box-shadow: 0 24px 48px rgba(0,0,0,0.14), 0 10px 20px rgba(0,0,0,0.08);
+}
+
+/* Subtle top glow on hover */
+.service-card::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(80% 80% at 50% 0%, rgba(var(--color-success-rgb), 0.18), transparent 70%);
+  opacity: 0;
+  transition: opacity var(--duration-normal) var(--ease-standard);
+}
+.service-card:hover::after,
+.service-card:focus-within::after {
+  opacity: 1;
+}
+
+/* Parallax icon pop */
+.service-card .service-icon {
+  transition: transform var(--duration-normal) var(--ease-standard);
+}
+.service-card:hover .service-icon {
+  transform: translateZ(20px) scale(1.05);
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .service-card,
+  .service-card-inner,
+  .service-card .service-icon {
+    transition: none !important;
+  }
+}
+
 /* About Section */
 .about {
   padding: var(--space-32) 0;
@@ -1040,7 +1113,7 @@ body {
 }
 
 .about-content {
-  max-width: 800px;
+  max-width: 1000px;
   margin: 0 auto;
   text-align: center;
 }
@@ -1083,6 +1156,103 @@ body {
 .benefits-list li i {
   color: var(--color-brand-primary);
   font-size: var(--font-size-lg);
+}
+
+
+/* --- About: Stats Tiles --- */
+.about-stats {
+  margin-top: var(--space-32);
+}
+
+.about-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-24);
+}
+
+/* Center content inside About stats tiles */
+.about-stat-card {
+  display: flex;
+  flex-direction: column;        /* stack value over label */
+  align-items: center;           /* horizontal center */
+  justify-content: center;       /* vertical center */
+  text-align: center;            /* center text */
+  gap: 6px;                      /* space between value and label */
+  min-height: 96px;              /* consistent tile height */
+  padding: 18px;                 /* compact padding */
+}
+
+.about-stat-card::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(80% 80% at 50% 0%, rgba(var(--color-success-rgb), 0.16), transparent 70%);
+  opacity: 0;
+  transition: opacity var(--duration-normal) var(--ease-standard);
+}
+
+.about-stat-card:hover,
+.about-stat-card:focus-within {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-lg);
+  border-color: rgba(var(--color-brown-600-rgb), 0.25);
+  z-index: 1;
+}
+
+.about-stat-card:hover::after,
+.about-stat-card:focus-within::after {
+  opacity: 1;
+}
+
+.about-stat-icon {
+  width: 54px;
+  height: 54px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, var(--color-brand-primary), var(--color-brand-primary-hover));
+  box-shadow: 0 8px 16px rgba(var(--color-red-500-rgb), 0.18);
+  color: var(--color-brand-white);
+}
+
+.about-stat-icon i {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.about-stat-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Value and label tweaks for centered layout */
+.about-stat-value {
+  margin: 0;                     /* remove any inherited margins */
+  line-height: 1.2;
+  font-size: 30px;
+}
+
+.about-stat-label {
+  margin: 0;
+  line-height: 1.2;
+  font-size: 15px;
+}
+
+/* Responsive layout for tiles */
+@media (max-width: 1024px) {
+  .about-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 520px) {
+  .about-stats-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Contact Section */
