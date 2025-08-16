@@ -1009,7 +1009,7 @@ body {
 
 .service-card:hover,
 .service-card:focus-within {
-  transform: translateY(-8px) scale(1.03);
+  transform: translateY(-8px)  scale(1.03);
   box-shadow: var(--shadow-lg);
   z-index: 10;
 }
